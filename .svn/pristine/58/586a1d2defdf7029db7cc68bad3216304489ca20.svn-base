@@ -1,0 +1,77 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop
+    	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- 扫描包 -->
+	<context:component-scan base-package="com.sinohealth.eszservice.aspect"
+		annotation-config="true" />
+
+
+	<!-- =================================================================== -->
+	<!-- AOP: 配置和切入 -->
+	<!-- =================================================================== -->
+	<aop:config>
+		<!-- 用户登录切入 -->
+		<aop:aspect id="loginAspect" ref="loginAspectBean">
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.doctor.impl.DoctorServiceImpl.login(..))"
+				method="doctorLoginAspectAround" />
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.sick.impl.SickServiceImpl.login(..))"
+				method="sickLoginAspectAround" />
+		</aop:aspect>
+		<!-- 用户登出切入 -->
+		<aop:aspect id="logoutAspect" ref="logoutAspectBean">
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.doctor.impl.DoctorServiceImpl.logout(..))"
+				method="doctorLogoutAspectAround" />
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.sick.impl.SickServiceImpl.logout(..))"
+				method="sickLogoutAspectAround" />
+		</aop:aspect>
+		
+		<!-- 用户注册切入 -->
+		<aop:aspect id="registerAspect" ref="registerAspectBean">
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.doctor.impl.DoctorServiceImpl.register*(..))"
+				method="doctorRegisterAspectAround" />
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.sick.impl.SickServiceImpl.register*(..))"
+				method="sickRegisterAspectAround" />
+		</aop:aspect>
+		<!-- ================ -->
+		<!-- 更新医生个人统计信息切入 -->
+		<!-- ================ -->
+		<aop:aspect id="fuZhenStatusAspect" ref="updateFuZhenStatusAspectBean">
+			<aop:around
+				pointcut="execution(* com.sinohealth.eszservice.service.visit.impl.PhaseServiceImpl.updateValues*(..))"
+				method="updateValuesAspectAround" />
+		</aop:aspect>
+	</aop:config>
+
+	<!-- 用户登录切入处理bean，处理登录积分 -->
+	<bean id="loginAspectBean" class="com.sinohealth.eszservice.aspect.LoginAspect"></bean>
+	<!-- 用户登录切入处理bean，处理登录积分 -->
+	<bean id="logoutAspectBean" class="com.sinohealth.eszservice.aspect.LogoutAspect"></bean>
+	<!-- 用户注册切入处理bean，处理用户注册积分 -->
+	<bean id="registerAspectBean" class="com.sinohealth.eszservice.aspect.RegisterAspect"></bean>
+	<!-- 更新医生个人统计信息切入 -->
+	<bean id="updateFuZhenStatusAspectBean"
+		class="com.sinohealth.eszservice.aspect.UpdateFuZhenStatusAspect"></bean>
+
+	<!-- Enable @AspectJ support -->
+	<aop:aspectj-autoproxy />
+
+
+</beans>  

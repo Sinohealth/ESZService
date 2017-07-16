@@ -1,0 +1,28 @@
+<table cellpadding="0" cellspacing="0" border="0" width="682" height="350" align="center" background="http://7xi7xa.com1.z0.glb.clouddn.com/esz_passowrd_bg.png" 
+ style="margin-top:10px;padding-left:40px;font-size:14px;line-height:24px;font-family:'微软雅黑'; color:#666;">
+ <tr><td style="padding-top:25px;">
+<strong>亲爱的</strong> <a style="color:blue;text-decoration:underline;">[toAddress]</a> <strong>，您好！</strong><br/>
+您在[requestTime]提交了找回密码请求。请点击下面的按钮重置密码（按钮24小时内有效）。
+ </td></tr>
+  <tr><td style="padding-left:20px;">
+  <a href="[link]" target="_blank"><img src="http://7xi7xa.com1.z0.glb.clouddn.com/esz_passowrd_btn.png"></a>
+  </td></tr>
+ <tr><td>
+如果按钮无法点击， 请复制下面的链接到浏览器地址栏访问。<br/>
+<a href="[link]" target="_blank">[link]</a>
+ </td></tr>
+ <tr><td style="padding-bottom:20px;">
+如果您没有提交找回密码请求，请忽略此邮件。<br/>
+本邮件由系统自动发出，请勿直接回复。
+ </td></tr>
+</table>
+
+<table cellpadding="0" cellspacing="0" border="0" width="682" height="126" align="center" background="http://7xi7xa.com1.z0.glb.clouddn.com/esz_passowrd_bg3.png" style="margin-top:15px;">
+ <tr><td style="padding-left:40px;padding-top:6px;font-size:12px;line-height:20px;font-family:'微软雅黑'; color:#666;">
+此邮件无需直接回复，如有任何问题请使用以下联系方式<br/>
+<strong>服务热线：</strong>010-85898384 (工作时间：周一至周日，9:00 - 18:00)<br/>
+<strong>客服邮箱：</strong>service@taskmed.com.cn (工作时间：周一至周日，9:00 - 18:00)<br/>
+<strong>帮助中心：</strong><a href="http://esf.taskmed.com.cn/help" target="_blank">http://efu.taskmed.com.cn/help</a><br/>
+©2015 Sinohealth, All Rights Reserved 粤ICP备14018144号-1
+ </td></tr>
+</table>

@@ -1,0 +1,100 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <meta name="format-detection"content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <title>[doctorName]</title>
+
+<style>
+@charset "utf-8";
+/*reset*/
+body,div,ol,ul,h1,h2,h3,h4,h5,h6,p,th,td,dl,dd,form,iframe,input,textarea,select,label,article,aside,footer,header,menu,nav,section,time,audio,video {
+  margin:0;
+  padding:0;
+}
+article,aside,footer,header,hgroup,nav,section,audio,canvas,video,img {
+    display: block;
+}
+body {
+    font-size: 100%; 
+    font-family:"Microsoft Yahei",Helvetica,STHeiti,Droid Sans Fallback; 
+	background:#F5F5F5;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+
+iframe,img {border:0;}
+
+.global{min-width: 320px;}
+
+.main{margin-top:2.25em;margin-left:2.25em;margin-right:2.25em;padding-bottom:1.5em;
+	background: #fff;
+	-webkit-border-radius: 8px;	
+	border-radius: 8px;
+}
+
+.ui-a{width:32%;float:left;padding-top:1em;padding-bottom:1em;}
+.ui-b{width:60%;float:left;padding-top:1.25em;padding-bottom:1em;padding-left:1em;}
+.ui-a img{float:right;max-width: 100%;}
+.clear{clear:both;}
+#txt01,#txt02,#txt03{color:#7D7D7D;margin-top:0.25em;}
+#txt01 span{color:#333;font-size:2em;}
+#txt04,#txt05,#txt06{text-align:center;color:#7D7D7D;}
+#txt04{margin-top:1em;}
+#txt04 span{color:#E3492A;}
+#txt05{color:#333;font-size:1.125em;margin-top:0.5em;margin-bottom:0.5em;}
+
+#img01{
+    width: 100px;
+    height: 100px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}
+#img02 img,#img03 img{margin:0 auto;max-width: 100%;}
+
+.sub{margin-bottom:1.75em;}
+#txt07,#txt08{margin-left:2.25em;}
+#txt07{color:#1690ED;margin-top:1.5em;margin-bottom:0.25em;}
+#txt08{margin-bottom:0.75em;color:#7D7D7D;}
+
+#img02{padding-left:2em;padding-right:2em;font-size:1.125em;}
+
+</style>
+
+</head>
+<body>
+  <div class="global">
+
+   <div class="main">
+     <div class="ui-a"><img id="img01" src ="[headshot]" /></div>
+     <div class="ui-b">
+	  <p id="txt01"><span>[doctorName]</span> [titleName]</p>
+	  <p id="txt02">[hospital]</p>
+	  <p id="txt03">[disciplineName]</p>
+     </div>
+	 <div class="clear"></div>
+
+    <p id="img02"><img src ="[qrcode]" /></p>
+    <p id="txt04">输入推荐码 : <span>[recommendCode]</span></p>
+    <p id="txt05">患者可以通过扫描添加到您</p>
+    <p id="txt06">不会泄露您的微信和手机号</p>
+
+   </div>
+
+  <div class="sub">
+    <p id="txt07">如何使用：</p>
+    <p id="txt08">用【心康-找医生】扫描医生二维码</p>
+    <p id="img03"><img src ="http://7xi7xa.com1.z0.glb.clouddn.com/img_qr_footer.png" /></p>
+  </div>
+
+
+  </div>
+</body>
+</html>

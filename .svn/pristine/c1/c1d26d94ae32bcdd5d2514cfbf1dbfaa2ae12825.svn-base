@@ -1,0 +1,141 @@
+package com.sinohealth.eszservice.common.utils;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
+
+/**
+ * 加密/解密 工具类
+ * 
+ * @author 黄世莲
+ * @since 2015-01-30
+ * 
+ */
+public class EncryptUtil {
+
+	private final static String DES = "DES";
+
+	/**
+	 * 根据键值进行加密(DES)
+	 * 
+	 * @param data
+	 * @param key
+	 *            加密键byte数组
+	 * @return
+	 * @throws Exception
+	 */
+	public static String encryptDes(String data, String key) throws Exception {
+		byte[] bt = encryptDes(data.getBytes(), key.getBytes());
+		String strs = Base64.encodeBase64String(bt);
+		return strs;
+	}
+
+	/**
+	 * 根据键值进行解密DES)
+	 * 
+	 * @param data
+	 * @param key
+	 *            加密键byte数组
+	 * @return
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public static String decryptDes(String data, String key)
+			throws IOException, Exception {
+		if (data == null)
+			return null;
+		byte[] buf = Base64.decodeBase64(data);
+		byte[] bt = decryptDes(buf, key.getBytes());
+		return new String(bt);
+	}
+
+	/**
+	 * 根据键值进行加密DES)
+	 * 
+	 * @param data
+	 * @param key
+	 *            加密键byte数组
+	 * @return
+	 * @throws Exception
+	 */
+	public static byte[] encryptDes(byte[] data, byte[] key) throws Exception {
+		// 生成一个可信任的随机数源
+		SecureRandom sr = new SecureRandom();
+
+		// 从原始密钥数据创建DESKeySpec对象
+		DESKeySpec dks = new DESKeySpec(key);
+
+		// 创建一个密钥工厂，然后用它把DESKeySpec转换成SecretKey对象
+		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(DES);
+		SecretKey securekey = keyFactory.generateSecret(dks);
+
+		// Cipher对象实际完成加密操作
+		Cipher cipher = Cipher.getInstance("DES");
+
+		// 用密钥初始化Cipher对象
+		cipher.init(Cipher.ENCRYPT_MODE, securekey, sr);
+
+		return cipher.doFinal(data);
+	}
+
+	/**
+	 * 根据键值进行解密DES)
+	 * 
+	 * @param data
+	 * @param key
+	 *            加密键byte数组
+	 * @return
+	 * @throws Exception
+	 */
+	public static byte[] decryptDes(byte[] data, byte[] key) throws Exception {
+		// 生成一个可信任的随机数源
+		SecureRandom sr = new SecureRandom();
+
+		// 从原始密钥数据创建DESKeySpec对象
+		DESKeySpec dks = new DESKeySpec(key);
+
+		// 创建一个密钥工厂，然后用它把DESKeySpec转换成SecretKey对象
+		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(DES);
+		SecretKey securekey = keyFactory.generateSecret(dks);
+
+		// Cipher对象实际完成解密操作
+		Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+
+		// 用密钥初始化Cipher对象
+		cipher.init(Cipher.DECRYPT_MODE, securekey, sr);
+
+		return cipher.doFinal(data);
+	}
+
+	public static void main(String[] args) throws Exception {
+		String data = DigestUtils.sha256Hex("000000").toUpperCase();
+		String key = "abcdefghigk";
+		String pwd_111 = DigestUtils.sha256Hex("111111").toUpperCase();
+		String den_pwd_111 = encryptDes(pwd_111, key);
+		String en = encryptDes("BCB15F821479B4D5772BD0CA866C00AD5F926E3580720659CC80D39C9D09802A", key);
+		String den = decryptDes(en, key);
+		String En = encryptDes(den, key);
+		String loginPwd = DigestUtils.sha256Hex("8D969EEF6ECAD3C29A3A629280E686CF0C3F5D5A86AFF3CA12020C923ADC6C92abcdefg").toUpperCase();
+		String loginPwd_111111 = DigestUtils.sha256Hex("BCB15F821479B4D5772BD0CA866C00AD5F926E3580720659CC80D39C9D09802AEabcdefg").toUpperCase();
+		String loginPwd2 = DigestUtils.sha256Hex("92925488B28AB12584AC8FCAA8A27A0F497B2C62940C8F4FBC8EF19EBC87C43Eabcdefg").toUpperCase();
+		String sha_111 = DigestUtils.sha256Hex("BCB15F821479B4D5772BD0CA866C00AD5F926E3580720659CC80D39C9D09802Aabcdefg").toUpperCase();
+//		System.out.println(String
+//				.format("data:%s, key:%s, encrypt: %s, decrypt: %s", data, key,
+//						en, den));
+		System.out.println("en: "+en);
+		System.out.println("den: "+den);
+		System.out.println("data:"+data+"\rencode:"+en+"\rdecode: "+den+"\rdeEn:"+En+
+				"\r loginPWD1:"+loginPwd+"\r loginPWD2:"+loginPwd2+"\r pwd_111: "+pwd_111+" \r den_pwd_111: " +den_pwd_111+" \r sha_111:"+sha_111
+				+" \r loginPwd_111111:"+loginPwd_111111);
+		System.out.println("===============================");
+		System.out.println(decryptDes("COrnQRn4c1HnjnFfsEDPFbtxt6qhAx42uk5YAOAvC3hv8/c22EQD1PTxo5hK/WGtk3rUy84VvbUV0jQ/z4HKaCQbyR5eVbPW", key));
+	}
+}

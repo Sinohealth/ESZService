@@ -1,0 +1,33 @@
+package com.sinohealth.eszservice.common.config;
+
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+import com.sinohealth.eszservice.common.utils.PropertiesLoader;
+
+public class VisitPushMsg {
+
+	/**
+	 * 保存全局属性值
+	 */
+	private static Map<String, String> map = Maps.newHashMap();
+
+	/**
+	 * 属性文件加载对象
+	 */
+	private static PropertiesLoader propertiesLoader = new PropertiesLoader(
+			"visitPushMsg.properties");
+
+	/**
+	 * 获取配置
+	 */
+	public static String getConfig(String key) {
+		String value = map.get(key);
+		if (value == null) {
+			value = propertiesLoader.getProperty(key);
+			map.put(key, value);
+		}
+		return value;
+	}
+
+}

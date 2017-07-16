@@ -1,0 +1,180 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop
+    	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- ######### 数据源配置 ########### -->
+	<context:property-placeholder
+		location="classpath:jdbc.properties,classpath:redis.properties"
+		ignore-unresolvable="true" />
+
+	<!-- 扫描包 -->
+	<context:component-scan
+		base-package="com.sinohealth.eszorm,com.sinohealth.eszservice" />
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="jdbcUrl" value="${jdbc.url}"></property>
+		<property name="user" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="driverClass" value="${jdbc.driverClassName}"></property>
+		<!-- 初始化时获取三个连接，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+		<property name="initialPoolSize" value="${jdbc.initialPoolSize}"></property>
+		<!-- 连接池中保留的最小连接数。Default: 3 -->
+		<property name="minPoolSize" value="${jdbc.minPoolSize}"></property>
+		<!-- 连接池中保留的最大连接数。Default: 15 -->
+		<property name="maxPoolSize" value="${jdbc.maxPoolSize}"></property>
+		<!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+		<property name="acquireIncrement" value="${jdbc.acquireIncrement}"></property>
+		<!-- 最大空闲时间，1800秒内未使用则连接被丢弃，若为0则永不丢弃。Default: 0 -->
+		<property name="maxIdleTime" value="${jdbc.maxIdleTime}"></property>
+	</bean>
+
+	<!-- 定义一个sessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="configLocation" value="classpath:hibernate.cfg.xml" 
+			/> -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.query.substitutions">true 'Y', false 'N'</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<!-- Hibernate Search index directory -->
+				<prop key="hibernate.search.default.indexBase">${app.search.index.basedir}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<!-- <prop key="hibernate.hbm2ddl.auto">create</prop> -->
+			</props>
+			<!-- Turn batching off for better error messages under PostgreSQL -->
+			<!-- hibernate.jdbc.batch_size=0 -->
+		</property>
+		<property name="packagesToScan" value="com.sinohealth.eszorm" /><!-- 
+			如果多个，用“,”分隔 -->
+		<!-- 字段名自动改为小写 <property name="namingStrategy"> <bean class="org.hibernate.cfg.ImprovedNamingStrategy" 
+			/> </property> -->
+
+		<property name="namingStrategy">
+			<bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+		</property>
+	</bean>
+
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative 
+		to JTA) -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+
+	<!-- =================================================================== -->
+	<!-- AOP: 配置和切入 -->
+	<!-- =================================================================== -->
+	<aop:config>
+		<!-- 这里要配置事务的切入，切入点指明了在执行DAO的所有方法时产生事务拦截操作 -->
+		<!-- <aop:pointcut expression="execution(* com.sinohealth.eszservice.common.persistence.SimpleBaseDao.*(..))" 
+			id="basedao_cut" /> -->
+		<aop:pointcut expression="execution(* com.sinohealth.eszservice..*DaoImpl.*(..))"
+			id="dao_cut" />
+		<aop:pointcut
+			expression="execution(* com.sinohealth.eszservice..*ServiceImpl.*(..))"
+			id="point_cut" />
+		<!-- doctorCount_cut是特例，有时候需要插入 -->
+		<aop:pointcut
+			expression="execution(* com.sinohealth.eszservice.service.doctor.impl.DoctorCountServiceImpl.get(..)) or execution(* com.sinohealth.eszservice.service.doctor.impl.DoctorServiceImpl.getProfile(..))"
+			id="doctorCount_cut" />
+		<aop:advisor pointcut-ref="dao_cut" advice-ref="txAdvice"
+			order="3" />
+		<!-- <aop:advisor pointcut-ref="basedao_cut" advice-ref="txAdvice" /> -->
+		<aop:advisor pointcut-ref="point_cut" advice-ref="txAdvice"
+			order="2" />
+		<aop:advisor pointcut-ref="doctorCount_cut" advice-ref="specialTxAdvice"
+			order="1" />
+	</aop:config>
+
+	<!-- Enable @Transactional support -->
+	<tx:annotation-driven />
+	<!-- <tx:annotation-driven transaction-manager="transactionManager" /> -->
+
+	<!-- Enable @AspectJ support -->
+	<!-- <aop:aspectj-autoproxy /> -->
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="login**" propagation="REQUIRED" />
+			<tx:method name="add**" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="update**" propagation="REQUIRED" />
+			<tx:method name="delete**" propagation="REQUIRED" />
+			<tx:method name="save**" propagation="REQUIRED" />
+			<tx:method name="register**" propagation="REQUIRED" />
+			<tx:method name="get*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="query*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="*" propagation="REQUIRED" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 特例事务配置 -->
+	<tx:advice id="specialTxAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- ===================== -->
+	<!-- Redis 配置 -->
+	<!-- ===================== -->
+	<bean id="jedisConnFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${redis.hostname}" />
+		<property name="password" value="${redis.password}" />
+		<property name="port" value="${redis.port}" />
+		<property name="usePool" value="${redis.usePool}" />
+		<property name="poolConfig" ref="jedisPoolConfig" />
+	</bean>
+
+	<!-- Redis 线程池配置 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${redis.pool.maxActive}" />
+		<property name="maxIdle" value="${redis.pool.maxIdle}" />
+		<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}" />
+		<property name="testOnBorrow" value="${redis.pool.testOnBorrow}" />
+	</bean>
+
+	<!-- redis template definition -->
+	<!-- 支持缓存可序列化的对象的模板 -->
+	<bean id="redisTemplate"
+		class="org.springframework.data.redis.core.RedisTemplate"
+		p:connection-factory-ref="jedisConnFactory">
+	</bean>
+	<!-- 以字符串形式缓存，全部内容的序列化都使用StringRedisSerializer，即：不支持缓存对象 -->
+	<bean id="strRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
+		p:connection-factory-ref="jedisConnFactory">
+	</bean>
+
+	<!-- 消息队列 -->
+	<bean id="eszserviceQueueListener" class="com.sinohealth.eszservice.queue.RedisQueueListener" />
+	<bean id="eszserviceQueue" class="com.sinohealth.eszservice.queue.RedisQueue"
+		destroy-method="destroy">
+		<property name="key" value="eszservice:queue"></property>
+		<property name="listener" ref="eszserviceQueueListener"></property>
+	</bean>
+
+	<!-- 推送消息xml配置 -->
+	<import resource="spring-context-redis.xml" />
+
+</beans>  
